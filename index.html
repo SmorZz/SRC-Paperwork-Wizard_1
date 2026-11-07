@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>SRC Paperwork Wizard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Questrial&family=Didact+Gothic&family=IBM+Plex+Mono:wght@500;600&display=swap">
+
+<style>
+/* Century Gothic where installed, geometric Google faces otherwise.
+   Layout: wizard → manifest → guide, each a single centred column with a sticky index. */
+:root{
+  /* Club palette, sampled from the CB South STEM Research Club logo and artwork:
+     indigo #303078 · sky #48C0E4 · logo blue #006CC0 · gold #FCCC60 · coral #FC7890 · teal #24B490 */
+  --paper:#FAFBFE; --card:#FFFFFF; --sunk:#F0F5FB;
+  --ink:#1E1E4A; --ink-soft:#4C4C78; --ink-faint:#74789F;
+  --rule:#CBD3E6; --rule-soft:#E5E9F4;
+  --accent:#006CC0; --accent-soft:#E2F0FB; --accent-ink:#005699;
+  --stamp:#B32741; --stamp-soft:#FCE9ED;
+  --ok:#0E7A62; --ok-soft:#E0F3EE;
+  --amber:#8A5A00; --amber-soft:#FDF1DA;
+  --onacc:#FFFFFF;
+  --fd:"Century Gothic","Questrial","Didact Gothic","URW Gothic","Avant Garde","Trebuchet MS",sans-serif;
+  --fb:"Century Gothic","Didact Gothic","Questrial","URW Gothic","Trebuchet MS",sans-serif;
+  --fm:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --shadow:0 1px 2px rgba(16,27,43,.07),0 10px 28px -18px rgba(16,27,43,.35);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0C0E24; --card:#161A3A; --sunk:#1E2349;
+  --ink:#EDEFFC; --ink-soft:#B4BAE0; --ink-faint:#8C93C0;
+  --rule:#343B6B; --rule-soft:#232851;
+  --accent:#5CC6F0; --accent-soft:#17264F; --accent-ink:#7FD4F5;
+  --stamp:#FF90A6; --stamp-soft:#3A1C2B;
+  --ok:#5FD0AC; --ok-soft:#113A33;
+  --amber:#FBD277; --amber-soft:#3A2D10;
+  --onacc:#0C0E24;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -18px rgba(0,0,0,.8);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --paper:#0C0E24; --card:#161A3A; --sunk:#1E2349;
+  --ink:#EDEFFC; --ink-soft:#B4BAE0; --ink-faint:#8C93C0;
+  --rule:#343B6B; --rule-soft:#232851;
+  --accent:#5CC6F0; --accent-soft:#17264F; --accent-ink:#7FD4F5;
+  --stamp:#FF90A6; --stamp-soft:#3A1C2B;
+  --ok:#5FD0AC; --ok-soft:#113A33;
+  --amber:#FBD277; --amber-soft:#3A2D10;
+  --onacc:#0C0E24;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -18px rgba(0,0,0,.8);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--fb);font-size:17px;line-height:1.62;margin:0;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.narrow{max-width:760px}
+h1,h2,h3,h4{font-family:var(--fd);margin:0;text-wrap:balance;line-height:1.22}
+p{margin:0}
+a{color:var(--accent-ink);text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:5px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--accent);color:var(--onacc);padding:10px 16px;border-radius:0 0 8px 0;z-index:99;font-weight:700}
+.skip:focus{left:0}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- masthead ---------- */
+.mast{background:var(--card);border-bottom:1px solid var(--rule)}
+.mast .wrap{padding-block:18px 16px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:16px;min-width:0}
+.logo{background:#fff;border:1.5px solid var(--rule);border-radius:12px;padding:8px 11px;flex:0 0 auto;line-height:0}
+.logo img{width:132px;height:auto;display:block}
+@media (max-width:560px){.logo img{width:104px}.brand{gap:12px}}
+.kicker{font-family:var(--fm);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+.mast h1{font-size:clamp(25px,4.6vw,36px);margin-top:7px;letter-spacing:.005em}
+.ghost{background:var(--card);border:1.5px solid var(--rule);border-radius:8px;padding:8px 14px;font-size:14px;font-weight:700;cursor:pointer;color:var(--ink-soft);white-space:nowrap}
+.ghost:hover{border-color:var(--accent);color:var(--accent-ink);background:var(--accent-soft)}
+
+/* ---------- phase 1 : wizard ---------- */
+.wizwrap{padding-block:32px 60px}
+.steps{display:flex;gap:4px;margin-bottom:10px}
+.steps i{height:6px;flex:1;border-radius:99px;background:var(--rule-soft)}
+.steps i.on{background:var(--accent)}
+.steps i.now{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.qcard{background:var(--card);border:1.5px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);padding:28px 26px 22px}
+@media (max-width:520px){.qcard{padding:21px 17px 18px}}
+.qn{font-family:var(--fm);font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+.qcard h2{font-size:clamp(22px,3.8vw,28px);margin-top:10px}
+.qhelp{color:var(--ink-soft);font-size:16.5px;margin-top:13px}
+.qhelp strong{color:var(--ink);font-weight:700}
+.exbox{margin-top:15px;border:1.5px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:13px 15px;font-size:15.5px;color:var(--ink)}
+.exbox b{font-family:var(--fd);font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:5px}
+.answers{display:flex;flex-direction:column;gap:11px;margin-top:24px;border:0;padding:0;margin-inline:0}
+.ans{display:flex;align-items:flex-start;gap:14px;width:100%;text-align:left;background:var(--paper);border:2px solid var(--rule);border-radius:12px;padding:16px 18px;cursor:pointer;transition:border-color .12s,background .12s;min-height:60px}
+.ans:hover{border-color:var(--accent);background:var(--accent-soft)}
+.ans .mk{width:24px;height:24px;border:2.5px solid var(--ink-faint);border-radius:6px;flex:0 0 auto;margin-top:2px;position:relative;background:var(--card)}
+.ans.rad .mk{border-radius:50%}
+.ans[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.ans[aria-pressed="true"] .mk{background:var(--accent);border-color:var(--accent)}
+.ans[aria-pressed="true"] .mk::after{content:"";position:absolute;left:7px;top:2px;width:6px;height:13px;border:solid var(--onacc);border-width:0 3px 3px 0;transform:rotate(43deg)}
+.ans.rad[aria-pressed="true"] .mk::after{left:6px;top:6px;width:7px;height:7px;border:0;background:var(--onacc);border-radius:50%;transform:none}
+.ans .lab{min-width:0}
+.ans .lab b{display:block;font-weight:700;font-size:18px}
+.ans .lab span{display:block;color:var(--ink-soft);font-size:15px;margin-top:3px;line-height:1.45}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px;padding-top:18px;border-top:1.5px solid var(--rule-soft);flex-wrap:wrap}
+.btn{background:var(--accent);color:var(--onacc);border:0;border-radius:10px;padding:13px 24px;font-weight:700;font-size:17px;cursor:pointer;font-family:var(--fd)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.lg{padding:16px 28px;font-size:18px}
+.link{background:none;border:0;color:var(--ink-soft);font-size:16px;cursor:pointer;padding:10px 4px;text-decoration:underline;text-underline-offset:4px;font-family:var(--fb)}
+.link:hover{color:var(--accent-ink)}
+.unsure{font-size:15px;color:var(--ink-soft);margin-top:16px;padding-left:13px;border-left:3px solid var(--rule)}
+
+/* ---------- phase 2 : results ---------- */
+.res{padding-block:30px 60px}
+.verdict{background:var(--card);border:1.5px solid var(--rule);border-radius:16px;box-shadow:var(--shadow);padding:26px}
+@media (max-width:520px){.verdict{padding:19px 16px}}
+.verdict .big{font-family:var(--fd);font-size:clamp(28px,6vw,46px);line-height:1.05}
+.verdict .big span{color:var(--accent-ink)}
+.verdict p.l{color:var(--ink-soft);margin-top:11px;max-width:64ch;font-size:16.5px}
+.alert{margin-top:20px;border:2px solid var(--stamp);background:var(--stamp-soft);border-radius:12px;padding:16px 18px}
+.alert h3{font-size:18px;color:var(--stamp)}
+.alert p{font-size:15.5px;margin-top:6px}
+.alert ul{margin:10px 0 0;padding-left:20px;font-size:16px}
+.alert li{margin-top:5px}
+.datecard{margin-top:20px;border:2px solid var(--accent);background:var(--accent-soft);border-radius:12px;padding:16px 18px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.datecard .d{font-family:var(--fd);font-size:clamp(26px,5vw,38px);line-height:1;color:var(--accent-ink);font-variant-numeric:tabular-nums}
+.datecard .w{min-width:0;flex:1 1 280px}
+.datecard h3{font-size:17px}
+.datecard p{font-size:15.5px;color:var(--ink-soft);margin-top:4px}
+.manifest{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:24px}
+.mf{background:var(--card);border:1.5px solid var(--rule);border-radius:13px;overflow:hidden}
+.mf>h3{padding:14px 16px;border-bottom:1.5px solid var(--rule-soft);font-size:16px;background:var(--sunk)}
+.mf ol{list-style:none;counter-reset:m;margin:0;padding:10px 12px 14px}
+.mf li{counter-increment:m;display:flex;gap:10px;align-items:baseline;font-size:15.5px;padding:7px 4px;border-bottom:1px solid var(--rule-soft)}
+.mf li:last-child{border-bottom:0}
+.mf li::before{content:counter(m);font-family:var(--fm);font-size:12px;font-weight:600;color:var(--ink-faint);min-width:17px}
+.mf code{font-family:var(--fm);font-size:12.5px;font-weight:600;color:var(--accent-ink);background:var(--accent-soft);border-radius:5px;padding:2px 6px;white-space:nowrap}
+.mf .late{color:var(--amber);font-size:13.5px}
+.why{margin-top:24px}
+.why h3{font-size:19px;margin-bottom:11px}
+.whylist{display:flex;flex-direction:column;gap:9px}
+.wrow{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1.5px solid var(--rule);border-left:5px solid var(--amber);border-radius:10px;padding:13px 16px;font-size:16px}
+.wrow.base{border-left-color:var(--ok)}
+.wrow code{font-family:var(--fm);font-size:12.5px;font-weight:600;flex:0 0 auto;min-width:38px;color:var(--ink-soft)}
+.wrow b{font-weight:700}
+.wrow em{font-style:normal;color:var(--ink-soft);display:block;font-size:15px;margin-top:3px}
+.go{display:flex;gap:14px;align-items:center;margin-top:28px;flex-wrap:wrap}
+
+/* ---------- phase 3 : guide ---------- */
+.prog{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:var(--card);border-bottom:1.5px solid var(--rule)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:31;background:var(--card)}
+.prog .wrap{padding-block:10px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.bar{flex:1 1 150px;min-width:0;height:10px;border-radius:99px;background:var(--rule-soft);overflow:hidden;border:1px solid var(--rule)}
+.bar i{display:block;height:100%;width:0;background:var(--ok);transition:width .35s ease}
+.prog b{font-family:var(--fm);font-size:13.5px;font-weight:600;white-space:nowrap}
+.cols{display:grid;grid-template-columns:238px minmax(0,1fr);gap:32px;align-items:start;padding-block:26px 60px}
+@media (max-width:900px){.cols{grid-template-columns:1fr;gap:18px}}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 62px);font-size:14.5px}
+@media (max-width:900px){.toc{position:static}}
+.toc h4{font-family:var(--fm);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+.toc ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+@media (max-width:900px){.toc ol{flex-direction:row;flex-wrap:wrap;gap:7px}}
+.toc a{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;text-decoration:none;color:var(--ink-soft)}
+@media (max-width:900px){.toc a{border:1.5px solid var(--rule)}}
+.toc a:hover{background:var(--accent-soft);color:var(--accent-ink)}
+.toc a.done{color:var(--ok);font-weight:700}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--rule);flex:0 0 auto;border:1px solid var(--ink-faint)}
+.toc a.done .dot{background:var(--ok);border-color:var(--ok)}
+.toc a.part .dot{background:var(--amber);border-color:var(--amber)}
+.toc code{font-family:var(--fm);font-size:12px;font-weight:600}
+.toc li.tg{font-family:var(--fm);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent-ink);padding:14px 9px 4px;font-weight:600}
+@media (max-width:900px){.toc li.tg{width:100%;padding:10px 2px 0}}
+.forms{display:flex;flex-direction:column;gap:24px;min-width:0}
+.grp{padding:8px 2px 0;border-top:3px solid var(--accent)}
+.grp h2{font-size:15px;font-family:var(--fm);font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:var(--accent-ink);margin-top:10px}
+.grp p{font-size:15px;color:var(--ink-soft);margin-top:4px}
+.form{background:var(--card);border:1.5px solid var(--rule);border-radius:13px;box-shadow:var(--shadow);overflow:hidden;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 70px)}
+.form>header{padding:17px 19px;border-bottom:1.5px solid var(--rule-soft);display:flex;gap:14px;align-items:flex-start;background:var(--sunk)}
+.num{font-family:var(--fm);font-size:14px;font-weight:600;background:var(--ink);color:var(--card);border-radius:8px;padding:6px 10px;flex:0 0 auto;min-width:46px;text-align:center}
+.form.isdone .num{background:var(--ok);color:var(--onacc)}
+.form>header .t{min-width:0;flex:1}
+.form h3{font-size:20px}
+.meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.tag{font-size:12px;font-family:var(--fm);font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:6px;padding:4px 8px;border:1.5px solid var(--rule);color:var(--ink-soft);background:var(--card)}
+.tag.req{background:var(--stamp-soft);border-color:var(--stamp);color:var(--stamp)}
+.tag.cond{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+.body{padding:18px 19px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+@media (max-width:800px){.body{grid-template-columns:1fr}}
+.lede{font-size:16.5px;color:var(--ink-soft);margin-bottom:16px}
+.sechead{font-family:var(--fm);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;margin:20px 0 8px}
+.sechead:first-child{margin-top:0}
+.roles{border:1.5px solid var(--rule-soft);border-radius:10px;overflow:hidden;margin:0}
+.roles div{display:grid;grid-template-columns:120px minmax(0,1fr);font-size:15px;border-top:1.5px solid var(--rule-soft)}
+.roles div:first-child{border-top:0}
+.roles dt{font-family:var(--fm);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);padding:10px 12px;background:var(--sunk);margin:0;font-weight:600}
+.roles dd{margin:0;padding:10px 12px;min-width:0}
+.checks{display:flex;flex-direction:column;gap:3px}
+.ck{display:flex;gap:12px;align-items:flex-start;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .12s}
+.ck:hover{background:var(--accent-soft)}
+.ck input{position:absolute;opacity:0;width:0;height:0}
+.ck .mk{width:21px;height:21px;border:2.2px solid var(--ink-faint);border-radius:5px;flex:0 0 auto;margin-top:2px;position:relative;background:var(--card)}
+.ck:has(input:checked) .mk{background:var(--ok);border-color:var(--ok)}
+.ck:has(input:checked) .mk::after{content:"";position:absolute;left:6px;top:1.5px;width:5px;height:11px;border:solid var(--onacc);border-width:0 2.6px 2.6px 0;transform:rotate(43deg)}
+.ck:has(input:checked) .tx{color:var(--ink-faint)}
+.ck input:focus-visible+.mk{outline:3px solid var(--accent);outline-offset:3px}
+.tx{font-size:16px;min-width:0}
+.tx em{font-style:normal;font-family:var(--fm);font-size:14px;font-weight:600;color:var(--accent-ink)}
+.tx s{color:var(--stamp);text-decoration:none;font-weight:700}
+.note{border-radius:10px;padding:13px 15px;font-size:15.5px;margin-top:16px;border:1.5px solid}
+.note b{font-family:var(--fd);display:block;font-size:13px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px}
+.note.warn{background:var(--stamp-soft);border-color:var(--stamp)}
+.note.warn b{color:var(--stamp)}
+.note.tip{background:var(--ok-soft);border-color:var(--ok)}
+.note.tip b{color:var(--ok)}
+.note.info{background:var(--amber-soft);border-color:var(--amber)}
+.note.info b{color:var(--amber)}
+.note ul{margin:7px 0 0;padding-left:19px}
+.note li{margin-top:4px}
+
+/* image viewer */
+.shots{display:flex;flex-direction:column;gap:12px;min-width:0}
+.swap{display:flex;gap:0;border:1.5px solid var(--rule);border-radius:9px;overflow:hidden}
+.swap button{flex:1;background:var(--card);border:0;padding:9px 6px;font-size:14px;font-weight:700;cursor:pointer;color:var(--ink-soft);font-family:var(--fd)}
+.swap button+button{border-left:1.5px solid var(--rule)}
+.swap button[aria-pressed="true"]{background:var(--accent);color:var(--onacc)}
+figure{margin:0}
+.shot{display:block;width:100%;border:1.5px solid var(--rule);border-radius:9px;background:#fff;padding:0;cursor:zoom-in;overflow:hidden;line-height:0}
+.shot img{width:100%;display:block}
+figcaption{font-size:14px;color:var(--ink-soft);margin-top:7px;line-height:1.5}
+figcaption b{color:var(--ink);font-weight:700}
+.zoomhint{font-size:13px;color:var(--ink-faint);font-family:var(--fm)}
+.noshot{border:2px dashed var(--rule);border-radius:9px;padding:15px;font-size:14.5px;color:var(--ink-soft)}
+.lb{position:fixed;inset:0;z-index:80;background:rgba(6,10,16,.9);display:flex;align-items:center;justify-content:center;padding:max(22px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(22px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));cursor:zoom-out;overflow:auto}
+.lb img{max-width:100%;border-radius:6px;background:#fff}
+.lb .x{position:fixed;top:max(16px,env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));background:#fff;color:#101B2B;border:0;border-radius:9px;width:44px;height:44px;font-size:22px;font-weight:700;cursor:pointer;z-index:2}
+
+/* pjas brief */
+.brief{background:var(--card);border:1.5px solid var(--rule);border-radius:13px;box-shadow:var(--shadow);overflow:hidden}
+.brief>header{padding:17px 19px;border-bottom:1.5px solid var(--rule-soft);background:var(--sunk)}
+.brief>header h3{font-size:20px}
+.brief>header p{font-size:15.5px;color:var(--ink-soft);margin-top:5px}
+.brief .in{padding:18px 19px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:12px;margin:0 0 6px}
+.fact{border:1.5px solid var(--rule-soft);border-radius:10px;padding:12px 14px;background:var(--paper)}
+.fact dt{font-family:var(--fm);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);font-weight:600}
+.fact dd{margin:4px 0 0;font-size:16px;font-weight:700}
+.fact dd small{display:block;font-weight:400;font-size:14.5px;color:var(--ink-soft);margin-top:2px}
+.cats{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.cat{font-family:var(--fm);font-size:13px;border:1.5px solid var(--rule);border-radius:6px;padding:4px 9px;background:var(--paper)}
+.cat b{color:var(--accent-ink)}
+
+/* deadline */
+.ddl{border:3px solid var(--stamp);background:var(--stamp-soft);border-radius:13px;padding:18px 20px;margin-bottom:18px}
+.ddl .top{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.ddl .dt{font-family:var(--fd);font-size:clamp(24px,5vw,34px);line-height:1.05;color:var(--stamp);font-variant-numeric:tabular-nums}
+.ddl .noex{font-family:var(--fm);font-size:13px;font-weight:600;letter-spacing:.14em;background:var(--stamp);color:#fff;border-radius:6px;padding:5px 11px;white-space:nowrap}
+.ddl .cd{font-size:15px;color:var(--ink-soft);font-family:var(--fm)}
+.ddl ul{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+.ddl li{display:flex;gap:12px;align-items:flex-start;font-size:16px;background:var(--card);border:1.5px solid var(--stamp);border-radius:9px;padding:12px 14px}
+.ddl li .h{color:var(--stamp);font-weight:700;display:block;margin-bottom:3px;font-family:var(--fd)}
+.ddl li b{color:var(--stamp);font-weight:700}
+.ddl li .n{font-family:var(--fm);font-weight:600;color:var(--stamp);flex:0 0 auto}
+.ddlstrip{margin-top:20px;border:2px solid var(--stamp);background:var(--stamp-soft);border-radius:12px;padding:15px 18px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.ddlstrip .dt{font-family:var(--fd);font-size:clamp(20px,4vw,27px);color:var(--stamp);line-height:1.05}
+.ddlstrip p{font-size:15.5px;color:var(--ink);flex:1 1 300px;min-width:0}
+.order{counter-reset:o;list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.order li{counter-increment:o;display:flex;gap:12px;align-items:baseline;font-size:15.5px;padding:9px 12px;background:var(--paper);border:1.5px solid var(--rule-soft);border-radius:9px}
+.order li::before{content:counter(o);font-family:var(--fm);font-size:12px;font-weight:600;color:var(--onacc);background:var(--accent);border-radius:5px;padding:2px 7px;flex:0 0 auto}
+.order code{font-family:var(--fm);font-size:13px;font-weight:600;color:var(--accent-ink)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.dup{background:var(--card);border:2px dashed var(--rule);border-radius:11px;padding:5px 10px}
+.dup .tx b{font-weight:700;color:var(--ink)}
+footer.ft{border-top:1.5px solid var(--rule);background:var(--card)}
+footer.ft .wrap{padding-block:24px 32px;font-size:14.5px;color:var(--ink-soft);max-width:80ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media print{.prog,.toc,.ghost,.swap{display:none!important}.form{break-inside:avoid;box-shadow:none}}
+</style>
+
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="brand">
+      <span class="logo"><img src="img/logo.png" alt="CB South STEM Research Club"></span>
+      <div>
+        <div class="kicker">CB South STEM Research Club · 2026–2027</div>
+        <h1>SRC Paperwork Wizard</h1>
+      </div>
+    </div>
+    <button class="ghost" id="restart" type="button" hidden>Change my answers</button>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- phase 1 -->
+<section id="p1" class="wizwrap wrap narrow" aria-label="Questionnaire">
+  <div class="steps" id="steps" role="progressbar" aria-label="Questionnaire progress" aria-valuemin="1" aria-valuenow="1" aria-valuemax="11"></div>
+  <div class="qcard">
+    <p class="qn" id="qn"></p>
+    <h2 id="qt"></h2>
+    <p class="qhelp" id="qh"></p>
+    <div id="qex"></div>
+    <div class="answers" id="qa" role="group" aria-labelledby="qt"></div>
+    <p class="unsure" id="qu"></p>
+    <div class="nav">
+      <button class="link" id="back" type="button">← Back</button>
+      <button class="btn" id="next" type="button">Continue</button>
+    </div>
+  </div>
+</section>
+
+<!-- phase 2 -->
+<section id="p2" class="res wrap" aria-label="Your required forms" hidden>
+  <div class="verdict">
+    <h2 class="big" id="vbig"></h2>
+    <p class="l" id="vsub"></p>
+    <div id="valert"></div>
+    <div id="vddl"></div>
+    <div class="manifest" id="vman"></div>
+    <div class="why">
+      <h3>Why each form is on your list</h3>
+      <div class="whylist" id="vwhy"></div>
+    </div>
+    <div class="go">
+      <button class="btn lg" id="toGuide" type="button">Walk me through filling these out →</button>
+      <button class="link" id="redo" type="button">Change an answer</button>
+    </div>
+  </div>
+</section>
+
+<!-- phase 3 -->
+<div id="p3" hidden>
+  <div class="prog">
+    <div class="wrap">
+      <b id="pct">0%</b>
+      <div class="bar" role="progressbar" aria-label="Checklist completion" aria-valuemin="0" aria-valuenow="0" aria-valuemax="100"><i id="barfill"></i></div>
+      <b id="cnt" style="color:var(--ink-soft);font-weight:400"></b>
+      <button class="ghost" id="backRes" type="button">My form list</button>
+      <button class="ghost" id="reset" type="button">Reset checkboxes</button>
+    </div>
+  </div>
+  <div class="wrap cols">
+    <nav class="toc" aria-label="Form index">
+      <h4>Your forms</h4>
+      <ol id="toc"></ol>
+    </nav>
+    <div class="forms" id="forms"></div>
+  </div>
+</div>
+
+</main>
+
+<footer class="ft">
+  <div class="wrap">
+    <p>Sample pages come from the four sample packets for John Doe and Jane Doe. Blank pages are the official forms as downloaded. Where this page and the official ISEF rules disagree, the rules win — check with Mrs. Rhodes.</p>
+    <p style="margin-top:8px">Your answers and checkmarks are saved in this browser only. They are not shared with anyone and will not follow you to another device.</p>
+  </div>
+</footer>
+
+<script>
+/* =================== questionnaire =================== */
+var QS = [
+{id:"fair", type:"multi", min:1,
+ q:"Which fair are you entering this year?",
+ help:"Each fair needs its own complete, separately signed packet. You cannot hand one packet in twice.",
+ opts:[{v:"bcsrc",l:"BCSRC",d:"Bucks County Science Research Competition"},
+       {v:"pjas",l:"PJAS Region 1C",d:"Pennsylvania Junior Academy of Science"}],
+ unsure:"Most club members enter both. Pick both if you are not sure yet — you can come back and change it."},
+
+{id:"cont", type:"yn",
+ q:"Is this a continuation of a project you competed with in a previous year?",
+ help:"A continuation is the <strong>second or third year of the same project</strong>, not simply a project in the same subject area. A brand new question in a field you worked in before is not a continuation.",
+ unsure:"If you reused last year's hypothesis, methods, or data, answer yes."},
+
+{id:"sites", type:"multi", min:1,
+ q:"Where will you carry out your experimentation?",
+ help:"Check everywhere you will work, even places you visit only once or work at remotely.",
+ opts:[{v:"school",l:"At school",d:"A CB South classroom or lab"},
+       {v:"home",l:"At home",d:""},
+       {v:"field",l:"In the field",d:"Outdoors, a public site, somewhere that is not a lab"},
+       {v:"rri",l:"At a regulated research institution",d:"A university, hospital, government, or company lab"},
+       {v:"other",l:"Somewhere else",d:"Any other site that is not home, school, or field"}],
+ unsure:"A regulated research institution is any location that is not home, school, or field. If an outside lab is involved at all, check it."},
+
+{id:"hum", type:"yn",
+ q:"Will your project involve human participants?",
+ help:"This covers anyone you <strong>experiment on, survey, interview, test, or observe</strong> in a way that could change their behavior. It also covers student-designed inventions and prototypes that people try out.",
+ ex:["Counts as human participants","A survey of classmates. A taste test. Timing volunteers on a task. Having someone wear a device you built. Observing people who know they are being studied."],
+ unsure:"If any person other than you provides data, answer yes. This one needs review board approval before you start, so answer yes if there is any doubt."},
+
+{id:"survey", type:"yn", showIf:function(a){return a.hum==="yes"},
+ q:"Will you hand out or post a survey, quiz, test, or reading for participants?",
+ help:"Anything you give to participants has to be reviewed in its <strong>final form</strong> before approval, and cannot be changed once your research begins.",
+ unsure:"Online forms count. So do paper questionnaires and anything you ask someone to read or watch."},
+
+{id:"ani", type:"yn",
+ q:"Will your project involve live vertebrate animals?",
+ help:"Vertebrate means an animal with a backbone — mammals, birds, reptiles, amphibians, fish. This question is about <strong>live animals you house, care for, or run procedures on</strong>.",
+ ex:["Not vertebrate animals","Humans, which was the earlier question. Insects, worms, and other invertebrates. Cells, tissue, blood, or fluids, even from a vertebrate. An animal that was already euthanized for some other purpose."],
+ unsure:"If you are working with animal cells or tissue rather than a living animal, answer no here and yes to the tissue question coming up."},
+
+{id:"anisite", type:"choice", showIf:function(a){return a.ani==="yes"},
+ q:"Where will the animal work happen?",
+ help:"This decides which vertebrate animal form you need, and which committee has to approve you first.",
+ opts:[{v:"rri",l:"At a regulated research institution",d:"Form 5B — the institution's animal care committee (IACUC) approves before you start"},
+       {v:"nonrri",l:"At school, home, or in the field",d:"Form 5A — the fair's SRC approves before you start"}],
+ unsure:""},
+
+{id:"micro", type:"yn",
+ q:"Will your project involve microorganisms, rDNA, or cell cultures?",
+ help:"Bacteria, viruses, fungi, mold, yeast, protists, recombinant DNA, and any cell line or culture.",
+ ex:["Counts","Growing bacteria on plates. Yeast fermentation. Transforming E. coli. Working with a cell line from a catalog. Composting studies that culture organisms."],
+ unsure:"A few things are exempt from prior review but still need a risk assessment — protists, manure composting, color-change water test kits, microbial fuel cells. Answer yes and sort the detail out with Mrs. Rhodes."},
+
+{id:"tissue", type:"yn",
+ q:"Will your project involve tissue, blood, blood products, or body fluids?",
+ help:"Fresh or frozen tissue, organs, primary cultures, established human or animal cell lines, blood, and body fluids — human or animal.",
+ unsure:"If you ordered a cell line from a catalog, answer yes. You will need the source and catalog number."},
+
+{id:"haz", type:"yn",
+ q:"Will your project involve hazardous chemicals, activities, or devices?",
+ help:"Any chemical with a real hazard rating, plus activities and equipment that could hurt someone — heat, electricity, pressure, radiation, sharp or powered tools.",
+ ex:["Counts","Acids and bases. Flammable solvents. An oven or hot plate. A centrifuge. Power tools. Anything with a safety data sheet you had to look up."],
+ unsure:"A risk assessment is recommended for every project anyway, so answering yes costs you one form and makes your packet stronger."},
+
+{id:"qs", type:"yn",
+ q:"Is an outside scientist, professor, or lab mentor overseeing your work?",
+ help:"Someone with an advanced degree in your field who reviews your plan and supervises the research — separate from Mrs. Rhodes, who is your adult sponsor.",
+ unsure:"If you work at an outside lab, with animals, or with microbes, you almost certainly need one. Answer yes if someone like that is involved at all."},
+
+{id:"paid", type:"yn",
+ q:"Did you or your parents pay for any support for this project?",
+ help:"Fees, tuition, payment to any adult who helped, or payment to a program that gave you lab space, mentorship, or help with documentation.",
+ unsure:"Buying your own materials is not paid support. Paying a program or a person for access or help is."},
+
+{id:"ai", type:"yn",
+ q:"Did you use generative AI anywhere in this project?",
+ help:"Any AI tool, including ones that only proofread or reword. If you used one you must disclose it and attach a prompt log or a written summary.",
+ unsure:"Grammarly, ChatGPT, Claude, and similar tools all count. Your answer here has to match what your research plan says — reviewers read both."}
+];
+
+/* =================== forms =================== */
+var FORMS_URL = "https://www.societyforscience.org/isef/forms/";
+
+var UNIVERSAL = {
+  id:"rules", num:"★", title:"Rules that apply to every single page", when:"always",
+  tags:[["req","Read first"]],
+  lede:"Most rejected packets fail on these, not on the science. Read them once before you write anything.",
+  roles:[["Adult sponsor","Michelle Rhodes — mrhodes@cbsd.org — on every form, every time"],
+         ["You fill","Anything addressed to the student researcher"],
+         ["Never you","Anything addressed to the sponsor, supervisor, scientist, or SRC"]],
+  imgs:{filled:"img/form1__filled.png", blank:"img/form1__blank.png"},
+  cap:"<b>Form 1, done correctly.</b> Only the name and title are filled. Every other field is marked EMPTY because Mrs. Rhodes owns them.",
+  checks:[
+    ["My adult sponsor is written as <em>Michelle Rhodes</em> everywhere a sponsor is asked for. I did not put a lab mentor, a parent, or an outside institution in that field."],
+    ["My project title is <s>character-for-character identical</s> on every form in the packet. I copied and pasted it rather than retyping it."],
+    ["Every single box has something in it. Where a field does not apply to me I wrote <em>N/A</em> instead of leaving it blank."],
+    ["My experimentation start date is <em>{START}</em>, and every signature on Forms 1, 1A, 1B, and 3 is dated <s>on or before</s> that day."],
+    ["I did not sign, initial, or date anything on behalf of Mrs. Rhodes, a supervisor, a scientist, or the SRC — even to save time."],
+    ["I typed into every form that is fillable, and used blue or black pen only where I had to write by hand."],
+    ["I printed single-sided. Nothing in the packet is double-sided."],
+    ["I kept a complete scanned or photographed copy of the signed packet for myself before I handed it in."]
+  ],
+  notes:[["warn","The one that catches people","A signature date that falls after your start date cannot be fixed by re-signing with an earlier date. That is falsification. If your dates are wrong, go to Mrs. Rhodes and tell her — there is a legitimate path to fix it."]]
+};
+
+var FORMS = [
+{id:"bcsrc_cover", fair:"bcsrc", num:"BCSRC", title:"BCSRC Paperwork Checklist", sub:"cover sheet", when:"always",
+ why:"Every BCSRC packet opens with it.",
+ tags:[["req","Required"],["when","First page of the BCSRC packet"]],
+ lede:"The cover that BCSRC reviewers read first. It is a map of everything behind it, so it has to match the packet exactly.",
+ roles:[["You fill","Top box, your details, all the Yes/No circles, the Student column"],["Rhodes fills","The Adult Sponsor column"],["Nobody fills","The two BCSRC Reviewer columns"]],
+ imgs:{blank:"img/bcsrc_cover__blank.png", filled:"img/bcsrc_cover__filled.png"},
+ cap:"<b>The finished cover.</b> Last name in capitals in the top box, every answer circled, Adult Sponsor column left marked EMPTY.",
+ checks:[
+   ["I printed my <s>LAST NAME</s> in the large top box and my first initial in the small box beside it."],
+   ["I circled the grade band I compete in — Grades 6–8, 9–10, or 11–12."],
+   ["I filled in my full name, school name, and <em>Michelle Rhodes</em> as adult sponsor."],
+   ["For team members I wrote <em>N/A - individual project</em> rather than leaving the line blank."],
+   ["I circled Yes or No for all four involvement questions: human subjects, vertebrate animals, hazardous biological agents, human or vertebrate tissues."],
+   ["I circled Yes or No for the Regulated Research Institution question."],
+   ["I circled Yes or No for the continuation project question."],
+   ["I marked an X in the <s>Student</s> column beside every form that is actually in my packet, and no X beside any form that is not."],
+   ["I left the <s>Adult Sponsor</s> column and both <s>BCSRC Reviewer</s> columns completely empty."]
+ ],
+ notes:[["warn","Must match the packet","If you circle Yes for vertebrate animals but there is no Form 5A or 5B behind it, the packet comes straight back. Circle your answers last, once the packet is assembled, so they describe what is really there."]]},
+
+{id:"pjas_cover", fair:"pjas", num:"PJAS", title:"PJAS Paperwork Submission Checklist", sub:"cover sheet", when:"always",
+ why:"Every PJAS packet opens with it.",
+ tags:[["req","Required"],["when","First page of the PJAS packet"]],
+ lede:"PJAS Region 1C's own cover sheet. Same idea as the BCSRC cover, different form — do not substitute one for the other.",
+ roles:[["You fill","Everything on the page"],["Rhodes fills","Nothing"],["Nobody fills","—"]],
+ imgs:{blank:"img/pjas_cover__blank.png", filled:"img/pjas_cover__filled.png"},
+ cap:"<b>The finished PJAS cover.</b> One research category checked, and a check beside every form actually in the packet.",
+ checks:[
+   ["First name, last name, and grade are filled in."],
+   ["School is Central Bucks High School South and sponsor is <em>Michelle Rhodes</em>."],
+   ["The research title matches the 60-character title on my PJAS Registration Form word for word."],
+   ["I checked <s>exactly one</s> research category, and it is the same category I checked on the Registration Form."],
+   ["I checked every mandatory form: this coversheet, Registration, Permission, Form 1, Form 1A, Research Plan, Form 1B."],
+   ["I checked every additional form that is in my packet, and left unchecked the ones that are not."]
+ ],
+ notes:[["info","Two categories look right? Pick one.","If your project could be Biochemistry or Chemistry, choose the one your methods spend the most time in, and use that same category on both the cover and the Registration Form. The category decides which judges you get."]]},
+
+{id:"pjas_reg", fair:"pjas", num:"PJAS", title:"PJAS Registration Form", when:"always",
+ why:"Your official entry into Region 1C.",
+ tags:[["req","Required"],["when","Before the registration deadline"]],
+ lede:"Your official entry into Region 1C. The school block is already filled in for you — do not retype it.",
+ roles:[["You fill","Your name, grade, title, category, address, phone"],["You sign","Student line; your parent signs the parent line"],["Rhodes signs","The sponsor line — leave it alone"]],
+ imgs:{blank:"img/pjas_reg__blank.png", filled:"img/pjas_reg__filled.png"},
+ cap:"<b>The finished Registration Form.</b>",
+ detail:["img/d_reg_sig.png","<b>The signature block.</b> Student and parent sign and date. The sponsor line stays untouched."],
+ checks:[
+   ["First name, last name, and sex are filled in. Region is <em>1C</em> and grade is filled in."],
+   ["My research title is <s>60 characters or fewer</s>. I counted, including spaces."],
+   ["I did not change the pre-filled school name, school address, or school phone."],
+   ["Sponsor reads <em>Michelle Rhodes</em>."],
+   ["I checked one research area, matching my PJAS coversheet."],
+   ["My home address and home phone are filled in — my address, not the school's."],
+   ["I signed and dated the student line."],
+   ["My parent signed and dated the parent line."],
+   ["I left the <s>sponsor signature and its date completely blank</s>."]
+ ],
+ notes:[["warn","The 60-character limit is real","It is a hard cap in the PJAS system. Your full ISEF title will usually be far too long, so write a short version for PJAS and use the full version everywhere else. Count the characters before you write it down."],
+        ["info","Signing means committing to States","The paragraph above the signatures says you will make every attempt to attend the State Competition if you receive a First Award at Regionals. Read it before your parent signs."]]},
+
+{id:"pjas_perm", fair:"pjas", num:"PJAS", title:"PJAS Presenter Permission Form", when:"always",
+ why:"Without it you are not allowed to compete at PJAS.",
+ tags:[["req","Required"],["when","Signed before the meet"]],
+ lede:"The waiver and photo release. Without it you cannot compete, and the form may not be altered in any way.",
+ roles:[["You sign","Student signature and date"],["Parent signs","Parent line, plus the photo release line"],["Rhodes signs","Sponsor line — leave it alone"]],
+ imgs:{blank:"img/pjas_perm__blank.png", filled:"img/pjas_perm__filled.png"},
+ cap:"<b>The finished Permission Form.</b> Three signature lines near the middle, one more under the photo release.",
+ checks:[
+   ["My name is written at the top. The school line is already filled in."],
+   ["I signed and dated the student line."],
+   ["My parent signed and dated the parent line."],
+   ["I left the <s>sponsor signature and date blank</s>."],
+   ["Under Photo Release, exactly one of the two boxes is marked."],
+   ["My parent signed and dated the <s>second</s> signature line under the photo release — the one people forget."],
+   ["I changed nothing else on the form. The note at the bottom says it may not be altered."]
+ ],
+ notes:[["warn","Four signatures, not three","Student, parent, sponsor, and then the parent again under the photo release. That last one is the most-missed signature in the whole PJAS packet."]]},
+
+{id:"pjas_med", fair:"pjas", num:"PJAS", title:"PJAS Regional Fair Medical Form", when:"always",
+ why:"Required for every PJAS competitor.",
+ tags:[["req","Required"],["when","Original signatures, brought to the meet"]],
+ lede:"Medical authorization for the day of the meet. Your parent supplies most of this, so hand it to them early.",
+ roles:[["You fill","Nothing on your own — do this sitting with a parent"],["Parent fills","All of it, and signs"],["Rhodes","Already listed as the responsible adult at the meet"]],
+ imgs:{blank:"img/pjas_med__blank.png", filled:"img/pjas_med__filled.png"},
+ cap:"<b>The finished Medical Form.</b> Every medication row and every condition row has a mark.",
+ detail:["img/d_med_top.png","<b>The header.</b> The responsible adult at the meet is already filled in as Mrs. Rhodes. Do not change it."],
+ checks:[
+   ["Student name and date of birth are filled in."],
+   ["Parent or legal guardian name is filled in, with <s>two</s> working phone numbers."],
+   ["Home address and city, state, zip are filled in."],
+   ["Health coverage plan and the I.D. or contract number are filled in, from the insurance card."],
+   ["Family physician name and phone number are filled in."],
+   ["Every medication row has either Yes or No checked. <s>No row is blank.</s> There are twelve of them."],
+   ["Every special medical condition row has Yes or No checked, including the Other row."],
+   ["The prescription medication box says either the actual medications and doses, or the word <em>None</em>."],
+   ["My parent signed and dated the bottom."],
+   ["An emergency contact and their phone number are filled in — someone other than my parents."],
+   ["I am bringing the <s>original signed copy</s> to the meet, not a photocopy."]
+ ],
+ notes:[["info","Give this one to your parents first","It is the only form you cannot complete yourself, and the insurance details take people a while to find. Hand it over the day you start the packet."]]},
+
+{id:"form1", fair:"both", num:"1", title:"Checklist for Adult Sponsor", when:"always",
+ why:"Required for every project at both fairs.",
+ tags:[["req","Required"],["when","Before experimentation"]],
+ lede:"This is Mrs. Rhodes's form, not yours. You fill in two fields at the top and then stop.",
+ roles:[["You fill","Student name and project title. That is all."],["Rhodes fills","Every checkbox, her name, signature, date, phone, and email"],["Nobody fills","—"]],
+ imgs:{blank:"img/form1__blank.png", filled:"img/form1__filled.png"},
+ cap:"<b>Form 1 done correctly.</b> Name and title only; everything else stamped EMPTY.",
+ detail:["img/d_form1_top.png","<b>What you fill.</b> Name and title at the top, and then you stop."],
+ detail2:["img/d_form1_bottom.png","<b>What you leave alone.</b> The sponsor block stays empty until Mrs. Rhodes gets to it."],
+ checks:[
+   ["I filled in my student name at the top."],
+   ["I filled in my project title, matching the other forms exactly."],
+   ["I checked <s>none</s> of the numbered boxes. Not one."],
+   ["I did not write Mrs. Rhodes's name, signature, date, phone, or email anywhere on this page."],
+   ["I included the page in the packet anyway — a blank Form 1 still has to be there."],
+   ["I gave Mrs. Rhodes enough lead time to actually review and sign it."]
+ ],
+ notes:[["warn","Filling this in for her is not helpful","It is her attestation that she reviewed your plan and discussed the risks with you. A student-completed Form 1 gets the packet sent back. Name and title only."]]},
+
+{id:"form1a", fair:"both", num:"1A", title:"Student Checklist", when:"always",
+ why:"Required for every project at both fairs.",
+ tags:[["req","Required"],["when","Before experimentation"]],
+ lede:"Your own summary of the project: who you are, where you work, and when. The research plan attaches directly behind it.",
+ roles:[["You fill","All of it"],["Rhodes","Named as adult sponsor, but signs nothing here"],["Nobody fills","—"]],
+ imgs:{blank:"img/form1a__blank.png", filled:"img/form1a__filled.png"},
+ cap:"<b>The finished Form 1A.</b>",
+ checks:[
+   ["Name, grade, school email, and phone are filled in."],
+   ["Team member lines say <em>N/A</em> if I am working alone."],
+   ["My full project title is in field 2 — the long version, not the shortened PJAS one."],
+   ["School, school phone, and the full school address are filled in."],
+   ["Adult sponsor is <em>Michelle Rhodes</em>, with her email and phone."],
+   ["I checked every place I will experiment: research institution, school, field, home, or other."],
+   ["Worksite names and full addresses are listed for every site that is not my home or school, even ones I only worked at virtually.","rri"],
+   ["Worksite lines say <em>N/A</em> because all my work happens at school or home.","norri"],
+   ["Question 7 is answered <s>Yes</s> — my project needs SRC, IRB, IACUC, or IBC approval — and the tentative start date is <em>{START}</em>.","srcyes"],
+   ["Question 7 is answered <s>No</s> — my project needs no prior approval — and the tentative start date is <em>{START}</em>.","srcno"],
+   ["Question 8 actual start date is <em>{START}</em>, and my end date is filled in, in mm/dd/yy."],
+   ["I answered the continuation question Yes or No."],
+   ["I checked my source of data: self-collected, mentor collected, publicly available, or other."],
+   ["My completed research plan is attached directly behind this form."]
+ ],
+ notes:[["info","Your start date is {START}","The club runs two start dates this season. Projects that need SRC, IRB, IACUC, or IBC approval start <b>12/23/2026</b>, which leaves the committee time to review. Everything else starts <b>12/01/2026</b>. Use the one shown in the steps above — it is already matched to the answers you gave."],
+        ["warn","Dates get checked against each other","Every signature on Forms 1, 1B, and 3 has to be dated before your start date. Reviewers line these up. Get the signatures first, then write the dates."]]},
+
+{id:"rplan", fair:"both", num:"RP", title:"Research Plan / Project Addendum", sub:"2026–27", when:"always",
+ why:"Required for every project, written before experimentation.",
+ tags:[["req","Required"],["when","Written before experimentation"]],
+ lede:"The longest piece and the one reviewers actually read. Use the current 2026–27 template — last year's version is not accepted.",
+ roles:[["You write","All of it"],["Rhodes","Reviews it; her initials go on Form 1, not here"],["Nobody fills","—"]],
+ imgs:{blank:"img/rplan__blank.png", filled:"img/rplan__filled.png"},
+ cap:"<b>The first page.</b> Header filled, all three ethics statements initialed.",
+ detail:["img/d_delete.png","<b>Sections you do not need.</b> On the samples these are stamped DELETE IF NOT USING. Delete them before you print."],
+ checks:[
+   ["I am working in the <s>2026–27</s> template, downloaded fresh, and editing in desktop Word — not the browser or a phone."],
+   ["Header is complete: name, school, <em>Michelle Rhodes</em> as adult sponsor, and full project title."],
+   ["I initialed <s>all three</s> ethics statements at the top."],
+   ["Section A Rationale explains the background and why the question matters, with citations."],
+   ["Section B states my research question, hypothesis, engineering goal, or expected outcomes — whichever apply."],
+   ["Section C lists materials and equipment, in a list or table rather than a paragraph."],
+   ["Section C gives procedures in enough detail that someone else could repeat them, and separates what I do from what a supervising adult does."],
+   ["Section C Risk and Safety points to my detailed sections, for example <em>See Hazardous Chemicals, Activities, and Devices Research section after the bibliography</em>."],
+   ["Section C Data Analysis names the variables and the actual statistical tests I will run."],
+   ["Acknowledgements list every adult who helped and exactly what they did."],
+   ["The AI section describes how I used AI, and it <s>matches my Yes on Form 2A</s>.","ai"],
+   ["The AI section says <em>Not applicable</em>, and it <s>matches my No on Form 2A</s>.","noai"],
+   ["Section D Bibliography has at least five real references in a consistent format, and I used them in Section A."],
+   ["The Human Participants section is complete, with no blank table cells.","hum"],
+   ["The Vertebrate Animal section is complete, with no blank table cells.","ani"],
+   ["The Potentially Hazardous Biological Agents section is complete: agents with BSL levels listed separately, sources, precautions, and disposal.","phba"],
+   ["The Hazardous Chemicals section is complete: risk assessment with NFPA and GHS ratings, concentrations, precautions, and disposal.","haz"],
+   ["I <s>deleted every section that does not apply</s> to my project before printing."],
+   ["Protocols I borrowed are credited with an in-text citation and a bibliography entry."],
+   ["Any addendum links are <s>full working URLs</s>, not shortened links, set so anyone with the link can view."],
+   ["I saved it as <em>LAST_ResearchPlan</em> and tested every link on a second device."]
+ ],
+ notes:[["tip","Two sample plans to copy the shape of","John Doe's plan (computational plus wet lab, hazardous chemicals) and Jane Doe's plan (cookware leaching, oven and glassware hazards). Match their level of detail, not their content."],
+        ["warn","Delete means delete","Leaving an empty Human Participants section tells a reviewer your project has human participants and the paperwork is missing. Every section you do not need comes out before you print."]]},
+
+{id:"form1b", fair:"both", num:"1B", title:"Approval Form", when:"always",
+ why:"Required for every project, one per student.",
+ tags:[["req","Required"],["when","Signed before experimentation"]],
+ lede:"One per student. The top third is yours and your parent's. The rest belongs to the SRC.",
+ roles:[["You sign","Section 1a — printed name, signature, date"],["Parent signs","Section 1b — printed name, signature, date"],["SRC only","Sections 2 and 3 — leave completely blank"]],
+ imgs:{blank:"img/form1b__blank.png", filled:"img/form1b__filled.png"},
+ cap:"<b>The finished Form 1B.</b> Section 1 filled, Sections 2 and 3 untouched.",
+ detail:["img/d_1b_src.png","<b>Sections 2 and 3.</b> On the samples every field is stamped EMPTY – SRC."],
+ checks:[
+   ["I printed my name, signed, and dated section 1a."],
+   ["My parent printed their name, signed, and dated section 1b."],
+   ["Both dates are <s>before my experimentation start date</s>."],
+   ["Section 2 is <s>completely blank</s> — both box a and box b."],
+   ["Section 3 is <s>completely blank</s> — both the regional and state rows."],
+   ["I read the ethics statement above my signature before signing it."],
+   ["I have one Form 1B per student. On a team, each member fills their own."]
+ ],
+ notes:[["warn","Do not help the SRC out","Students sometimes print a chair's name into Section 2 or 3 thinking it speeds things up. It invalidates the form."]]},
+
+{id:"form2a", fair:"both", num:"2A", title:"Student Support Disclosure Form", when:"always",
+ why:"Required for every project — discloses every adult who helped.",
+ tags:[["req","Required"],["when","Before or after experimentation"]],
+ lede:"Every adult who helped, and exactly how. One form for the whole project, even on a team.",
+ roles:[["You fill","All four role sections, both disclosures"],["You sign","The attestation at the bottom"],["Nobody else","No adult signs this form"]],
+ imgs:{blank:"img/form2a__blank.png", filled:"img/form2a__filled.png"},
+ cap:"<b>The finished Form 2A.</b>",
+ detail:["img/d_2a_sec4.png","<b>Section 4.</b> Where a paperwork mentor or peer reviser goes — name, organization, email, phone, relationship, contribution, and duration."],
+ checks:[
+   ["Section 1 Adult Sponsor is <em>Michelle Rhodes</em>, Central Bucks High School South, mrhodes@cbsd.org, with her phone."],
+   ["Her relationship to me reads <em>Adult Sponsor - SRC Club Advisor</em>, with her expertise, contribution, and duration filled in."],
+   ["Section 2 Direct Supervisor is filled in with the adult who physically supervises me.","rri"],
+   ["Section 2 Direct Supervisor is left blank, because Mrs. Rhodes is already listed in full in Section 1 and the form says to list a person once.","norri"],
+   ["Section 3 Qualified Scientist is filled in with my scientist's name, organization, email, and phone.","qs"],
+   ["Section 3 Qualified Scientist says <em>N/A</em>, because my project does not require one.","noqs"],
+   ["Section 4 lists every other adult or student who helped — paperwork mentors, peer revisers, relatives, lab staff — with what they actually did."],
+   ["I answered <s>Yes</s> to paid support and explained the fees, tuition, or payment in the box.","paid"],
+   ["I answered <s>No</s> to paid support, and that is true — no fees, tuition, or payment to anyone who helped.","nopaid"],
+   ["I answered <s>Yes</s> to AI usage and attached my prompt log or written summary.","ai"],
+   ["I answered <s>No</s> to AI usage, and my research plan's AI section says Not applicable to match.","noai"],
+   ["I signed and dated the attestation and printed my name underneath."]
+ ],
+ notes:[["warn","The AI answer has to match","Reviewers read the plan and the form side by side. If your plan mentions an AI tool and this form says No, that is a contradiction in a document you signed."],
+        ["info","Leaving someone off is the bigger risk","Nobody gets penalized for a long Section 4. Projects do get penalized when a reviewer learns an adult helped and the form never mentioned them."]]},
+
+{id:"form3", fair:"both", num:"3", title:"Risk Assessment Form", when:"haz",
+ why:"Your project involves hazards that need a documented risk assessment.",
+ tags:[["req","Required for you"],["when","Completed before experimentation"]],
+ lede:"Recommended for every project and required for yours. You write the content with your supervisor; only they sign it.",
+ roles:[["You fill","Questions 1 through 5, and the supervisor's printed name"],["Supervisor fills","Signature, date, experience, position, contact"],["Nobody fills","—"]],
+ imgs:{blank:"img/form3__blank.png", filled:"img/form3__filled.png"},
+ cap:"<b>The finished Form 3.</b>",
+ detail:["img/d_f3_sup.png","<b>The supervisor block.</b> You may print the name. Everything else is stamped EMPTY – Mrs. Rhodes completes."],
+ checks:[
+   ["1a lists every hazardous chemical, activity, and device by name — not a vague category."],
+   ["1b lists microorganisms, or says <em>None. No microorganisms will be used in this project.</em>"],
+   ["2 identifies the real risks with their GHS categories or NFPA ratings, and ends with an honest overall risk level."],
+   ["3 describes the actual precautions: the PPE I wear, where I work, who supervises, and what I do about spills."],
+   ["3 states whether I did field work and lists permits, or says there was none."],
+   ["4 describes disposal specifically, referencing the safety data sheets and my school's disposal plan."],
+   ["5 lists my safety sources: the SDS by manufacturer, the science department safety plan, and the ISEF rules."],
+   ["I printed the supervisor's name in the bottom block."],
+   ["I left the supervisor's <s>signature, date, experience, position, and contact fields blank</s>."],
+   ["My answers here do not contradict the hazardous chemicals section of my research plan."]
+ ],
+ notes:[["tip","Minimal risk is a valid answer","Form 3 is a record that you thought about risk in advance, not proof that your project is dangerous. If the honest conclusion is low risk, write that and explain why."]]},
+
+{id:"form2b", fair:"both", num:"2B", title:"Qualified Scientist Form", when:"qs",
+ why:"A qualified scientist is overseeing your work.",
+ tags:[["cond","Added by your answers"],["when","Signed before experimentation"]],
+ lede:"Required when a qualified scientist oversees your project. They complete it — you only supply the top.",
+ roles:[["You fill","Student name and project title"],["Scientist fills","Their background, the six questions, signature, date"],["Direct supervisor","Fills the right column only if the scientist cannot supervise you in person"]],
+ imgs:{blank:"img/form2b__blank.png"},
+ cap:"<b>The blank Form 2B.</b> No completed sample yet — ask Mrs. Rhodes to see one.",
+ checks:[
+   ["Student name and project title are at the top."],
+   ["My qualified scientist filled in their name, educational background, degrees, experience, position, institution, and contact."],
+   ["They answered questions 1a–1d about what the project involves, and their answers match my Form 1A and research plan."],
+   ["They answered whether this is part of a larger study, whether they supervise me directly, and whether they are providing data."],
+   ["Question 5 describes their actual role and how long their support lasts."],
+   ["They signed and dated the form before I started experimenting."],
+   ["If my scientist cannot supervise me in person, the Direct Supervisor column on the right is also completed and signed."],
+   ["I did not fill in or sign any part of their section."]
+ ],
+ notes:[["warn","Give them two weeks","Outside scientists are busy and this form asks for real detail. Email it as soon as you know you need it, and tell them the date you need it back — not the date it is due."]]},
+
+{id:"form2c", fair:"both", num:"2C", title:"Regulated Research Institution Form", when:"rri",
+ why:"You are working at a regulated research institution.",
+ tags:[["cond","Added by your answers"],["when","AFTER experimentation"]],
+ lede:"One per outside worksite. The only form completed after you finish, so it comes in at fair check-in rather than with the packet.",
+ roles:[["You fill","Student name and project title"],["Supervising adult","Everything else, after your work is done"],["Nobody fills","—"]],
+ imgs:{blank:"img/form2c__blank.png"},
+ cap:"<b>The blank Form 2C.</b> No completed sample yet — ask Mrs. Rhodes to see one.",
+ checks:[
+   ["Student name and project title are at the top."],
+   ["I gave it to my supervising adult at the institution — <s>not my school sponsor</s> — after finishing my work there."],
+   ["They described the independent and creative work I did, especially on the hypothesis or engineering goal."],
+   ["They stated how long they supported the project and detailed my actual role, separating what I observed from what I did."],
+   ["They answered whether they provided data, and whether I worked as part of a group."],
+   ["They signed, dated, and gave their title, institution, education, and contact."],
+   ["It is printed single-sided — the form says it will be displayed at my project booth."],
+   ["I have one Form 2C for each outside worksite I used."]
+ ],
+ notes:[["info","This one arrives late on purpose","The BCSRC checklist lists it as 1C and notes it is submitted after the project is complete. Do not hold up the rest of your packet waiting for it, but bring it to check-in."]]},
+
+{id:"form4", fair:"both", num:"4", title:"Human Participants Form", sub:"plus Sample Informed Consent", when:"hum",
+ why:"Your project involves human participants.",
+ tags:[["cond","Added by your answers"],["when","IRB approval BEFORE experimentation"]],
+ lede:"Surveys, tests, interviews, observation, and anything you ask a person to do. Needs review board approval before you collect a single response.",
+ roles:[["You fill","Both forms, completely"],["Rhodes","Email her today"],["IRB","Reviews and approves before you start"]],
+ imgs:{blank:"img/form4__blank.png"},
+ cap:"<b>The blank Form 4.</b> No completed sample yet — ask Mrs. Rhodes to see one.",
+ detail:["img/form4c__blank.png","<b>Sample Informed Consent Form.</b> Submitted with Form 4. Every field filled, signatures left blank, this year's dates at the bottom."],
+ checks:[
+   ["I emailed Mrs. Rhodes with the subject line <em>Human Subjects Research</em> describing my plan, and did not wait for a reply before continuing."],
+   ["Every box on Form 4 has something in it. Where something does not apply I wrote <em>Not applicable</em>."],
+   ["My Human Participants section of the research plan is complete: participants, recruitment, methods, risk assessment, privacy, and consent process."],
+   ["I attached a Sample Informed Consent Form with this year's dates at the bottom — every field filled, signatures left blank."],
+   ["Every item I will hand participants is attached in final form.","survey"],
+   ["I have read the ISEF guidelines for online survey consent procedures.","survey"],
+   ["I have IRB approval in writing <s>before</s> collecting any data."]
+ ],
+ notes:[["warn","You cannot write the survey later","Everything you give participants has to be reviewed in final form before approval, and cannot change once your research begins. Get it right the first time."]]},
+
+{id:"form5a", fair:"both", num:"5A", title:"Vertebrate Animal Form", sub:"school, home, or field", when:"ani_norri",
+ why:"Live vertebrate animals, outside a regulated research institution.",
+ tags:[["cond","Added by your answers"],["when","SRC approval BEFORE experimentation"]],
+ lede:"Live vertebrate animals studied somewhere that is not a regulated research institution. SRC approval first, no exceptions.",
+ roles:[["You fill","The form and the animal section of your research plan"],["Supervisor or vet","May need to sign and be present"],["SRC","Approves before you start"]],
+ imgs:{blank:"img/form5a__blank.png"},
+ cap:"<b>The blank Form 5A.</b> No completed sample yet — ask Mrs. Rhodes to see one.",
+ checks:[
+   ["I emailed Mrs. Rhodes with the subject line <em>Vertebrate Animals Research</em> describing my plan."],
+   ["I understand that students may <s>not euthanize an animal</s> for a project. If that was the plan, the plan changes."],
+   ["My research plan's Vertebrate Animal section is complete: alternatives considered, justification, procedures, housing, daily care, monitoring, and disposition."],
+   ["Every box on the form has something in it — no blanks."],
+   ["I have the signatures the form requires, which may include a veterinarian."],
+   ["I have written SRC approval before any work begins."]
+ ],
+ notes:[["info","Cells and tissue are a different category","If your animal was already euthanized for another purpose, or you are working with cells, tissue, or fluids, this is usually not a vertebrate animal project. Retake the questionnaire and answer that question differently."]]},
+
+{id:"form5b", fair:"both", num:"5B", title:"Vertebrate Animal Form", sub:"at an RRI", when:"ani_rri",
+ why:"Live vertebrate animals at a regulated research institution.",
+ tags:[["cond","Added by your answers"],["when","IACUC approval BEFORE, form signed AFTER"]],
+ lede:"Live vertebrate animals at a regulated research institution. The institution's animal care committee approves first; the form is signed when you finish.",
+ roles:[["You fill","Student name and project title"],["Scientist or PI","Everything else, after experimentation"],["IACUC","Approves before any work starts"]],
+ imgs:{blank:"img/form5b__blank.png"},
+ cap:"<b>The blank Form 5B.</b> No completed sample yet — ask Mrs. Rhodes to see one.",
+ checks:[
+   ["I emailed Mrs. Rhodes with the subject line <em>Vertebrate Animals Research</em> describing my plan."],
+   ["The title and protocol number of the IACUC-approved project are filled in."],
+   ["Species and number of animals used are recorded."],
+   ["My qualified scientist described my role in detail: procedures, equipment, oversight, and safety precautions."],
+   ["The weight loss or death question is answered, with a documenting letter attached if the answer is Yes."],
+   ["The tissue question is answered, and Forms 6A and 6B are included if it is Yes."],
+   ["Laboratory training provided to me is listed, with dates."],
+   ["A <s>copy of the institution's IACUC approval is attached</s>. A letter from the scientist is not enough."],
+   ["My qualified scientist or principal investigator signed and dated it."]
+ ],
+ notes:[["warn","The IACUC letter is not optional","The form says explicitly that a letter from the qualified scientist cannot substitute for the actual IACUC approval document. Request it early."]]},
+
+{id:"form6a", fair:"both", num:"6A", title:"Potentially Hazardous Biological Agents Risk Assessment", when:"phba",
+ why:"Your project involves microorganisms, rDNA, cells, or tissue.",
+ tags:[["cond","Added by your answers"],["when","SRC, IACUC, or IBC approval BEFORE experimentation"]],
+ lede:"Microorganisms, rDNA, cell lines, tissue, blood, and body fluids. Completed by your scientist or supervisor with you.",
+ roles:[["You draft","Section 1 and 2 content, with your supervisor"],["Scientist or supervisor","Section 3 boxes, certification, signature"],["SRC or IBC","Approves before you start"]],
+ imgs:{blank:"img/form6a__blank.png"},
+ cap:"<b>The blank Form 6A.</b> No completed sample yet — ask Mrs. Rhodes to see one.",
+ checks:[
+   ["Every agent is listed <s>separately</s> with its strain, source, quantity, and biosafety level risk group."],
+   ["I determined biosafety levels from ATCC.org or another reputable source, and checked the <s>highest</s> applicable level."],
+   ["BSL documentation for each agent is saved for the addendum — one page per agent, naming the agent, its BSL rating, and the source."],
+   ["The BSL level of my experimentation site is checked: None, BSL-1, or BSL-2."],
+   ["Precautions use the standard phrasing: work in a BSL-X laboratory at the named institution under my supervisor's direction, with appropriate PPE."],
+   ["Disposal is described specifically: autoclaving at 121 °C for 20 minutes, 10% bleach, and biohazard bags as appropriate."],
+   ["My training and my supervisor's training are both described."],
+   ["The correct Section 3 box is checked for where the work happens and what approval it needed."],
+   ["My qualified scientist or supervisor signed and dated the certification, and checked the BSL level there too."],
+   ["I kept non-biological hazards <s>out</s> of this form — those belong on Form 3."]
+ ],
+ notes:[["warn","Never mention BSL-2 if everything you use is BSL-1","Overstating your biosafety level creates approval requirements that do not apply to you and can stall your packet for weeks."]]},
+
+{id:"form6b", fair:"both", num:"6B", title:"Human and Vertebrate Animal Tissue Form", when:"tis",
+ why:"Your project involves tissue, blood, blood products, or body fluids.",
+ tags:[["cond","Added by your answers"],["when","Completed BEFORE experimentation"]],
+ lede:"Fresh or frozen tissue, established cell lines, blood, blood products, and body fluids. Always submitted together with Form 6A.",
+ roles:[["You fill","Questions 1 through 3"],["Scientist or supervisor","The verification boxes, signature, title, institution, contact"],["Nobody fills","—"]],
+ imgs:{blank:"img/form6b__blank.png"},
+ cap:"<b>The blank Form 6B.</b> No completed sample yet — ask Mrs. Rhodes to see one.",
+ checks:[
+   ["I checked every tissue type my project uses, and described anything I marked as exempt."],
+   ["I stated where the tissue comes from, with the source and <s>catalog number</s> for any established cell line."],
+   ["IACUC or IRB certification is attached if the tissue came from a study at a research institution."],
+   ["My scientist or supervisor checked the de-identified tissue box, the blood-borne pathogens box, or both as applicable."],
+   ["They signed and dated it <s>before</s> experimentation, with their title, phone or email, and institution."],
+   ["Form 6A is in the packet alongside this one — 6B is never submitted by itself."]
+ ],
+ notes:[]},
+
+{id:"form7", fair:"both", num:"7", title:"Continuation / Research Progression Form", when:"cont",
+ why:"This is a continuation of a project from a previous year.",
+ tags:[["cond","Added by your answers"],["when","With the packet"]],
+ lede:"Your project continues work from a previous year. You have to show what is genuinely new.",
+ roles:[["You fill","The form and the explanation"],["Rhodes","Reviews what has changed"],["Nobody fills","—"]],
+ imgs:{},
+ cap:"",
+ checks:[
+   ["Form 7 explains specifically how this year's work differs from last year's."],
+   ["Last year's abstract is attached."],
+   ["Last year's research plan is attached."],
+   ["Forms are included for <s>all</s> previous years, not just the most recent one."],
+   ["My Section A Rationale is <s>written fresh this year</s>, not pasted from last year's plan."],
+   ["I checked the continuation box on Form 1A and circled Yes on the BCSRC cover."]
+ ],
+ notes:[["warn","Copy-paste gets flagged","Protocols can legitimately repeat year to year. The rationale, hypothesis, and analysis cannot. External reviewers compare continuation plans against the previous year's."]]}
+];
+
+var PREAPPROVAL = {form4:"Form 4 — IRB approval", form5a:"Form 5A — SRC approval", form5b:"Form 5B — IACUC approval", form6a:"Form 6A — SRC, IACUC, or IBC approval"};
+
+var DEADLINE = {label:"Thursday, November 13, 2026", short:"November 13", y:2026, m:10, d:13};
+function deadlineCountdown(){
+  var now = new Date(), end = new Date(DEADLINE.y, DEADLINE.m, DEADLINE.d, 23, 59, 59);
+  var days = Math.ceil((end - now) / 86400000);
+  if(days > 1)  return days + " days left";
+  if(days === 1) return "1 day left";
+  if(days === 0) return "Due today";
+  return "This deadline has passed";
+}
+var CATS = [["BEH","Behavioral / Psychology"],["BC","Biochemistry"],["BIO","Biology, general"],["BOT","Botany"],
+            ["CHM","Chemistry"],["CPS","Computer"],["ES","Earth and Space"],["EC","Ecology"],["ENG","Engineering"],
+            ["MAT","Mathematics"],["MIC","Microbiology"],["PHY","Physics"],["ZOO","Zoology"]];
+
+/* =================== state =================== */
+var KEY = "src-wizard-v3";
+var A = {}, DONE = {}, VIEW = {}, PHASE = 1, qi = 0;
+
+function el(id){ return document.getElementById(id); }
+function load(){
+  try{
+    var raw = localStorage.getItem(KEY); if(!raw) return;
+    var o = JSON.parse(raw);
+    if(o.a) A = o.a; if(o.done) DONE = o.done; if(o.view) VIEW = o.view;
+    if(o.phase && complete()) PHASE = o.phase;
+  }catch(e){}
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify({a:A,done:DONE,view:VIEW,phase:PHASE})); }catch(e){} }
+
+function visibleQs(){
+  var out = [];
+  for(var i=0;i<QS.length;i++) if(!QS[i].showIf || QS[i].showIf(A)) out.push(QS[i]);
+  return out;
+}
+function answered(q){
+  var v = A[q.id];
+  if(q.type === "multi") return !!(v && v.length >= (q.min||1));
+  return !!v;
+}
+function complete(){
+  var vs = visibleQs();
+  for(var i=0;i<vs.length;i++) if(!answered(vs[i])) return false;
+  return true;
+}
+function has(id,v){ var a = A[id]; return !!(a && a.indexOf(v) !== -1); }
+function F(){
+  return {bcsrc:has("fair","bcsrc")?1:0, pjas:has("fair","pjas")?1:0,
+    rri:(has("sites","rri")||has("sites","other"))?1:0, cont:A.cont==="yes"?1:0,
+    hum:A.hum==="yes"?1:0, survey:A.survey==="yes"?1:0, ani:A.ani==="yes"?1:0,
+    anirri:A.anisite==="rri"?1:0, micro:A.micro==="yes"?1:0, tis:A.tissue==="yes"?1:0,
+    haz:A.haz==="yes"?1:0, qs:A.qs==="yes"?1:0, paid:A.paid==="yes"?1:0, ai:A.ai==="yes"?1:0};
+}
+function needQS(f){ return f.qs || f.rri || f.ani || f.micro; }
+/* SRC / IRB / IACUC / IBC pre-approval pushes the earliest legal start date back. */
+function needsSRC(f){ return !!(f.hum || f.ani || f.micro || f.tis); }
+function startDate(f){ return needsSRC(f) ? "12/23/2026" : "12/01/2026"; }
+function sub(s,f){ return String(s).replace(/\{START\}/g, startDate(f)); }
+function applies(fm,f){
+  if(fm.fair === "bcsrc" && !f.bcsrc) return false;
+  if(fm.fair === "pjas"  && !f.pjas)  return false;
+  if(fm.fair === "both"  && !f.bcsrc && !f.pjas) return false;
+  var w = fm.when;
+  if(w === "always") return true;
+  if(w === "haz")  return !!(f.haz || f.micro || f.hum || f.ani || f.tis);
+  if(w === "qs")   return !!needQS(f);
+  if(w === "rri")  return !!f.rri;
+  if(w === "hum")  return !!f.hum;
+  if(w === "ani_rri")   return !!(f.ani && f.anirri);
+  if(w === "ani_norri") return !!(f.ani && !f.anirri);
+  if(w === "phba") return !!(f.micro || f.tis);
+  if(w === "tis")  return !!f.tis;
+  if(w === "cont") return !!f.cont;
+  return true;
+}
+function lineOn(c,f){
+  if(!c) return true;
+  var m = {srcyes:needsSRC(f), srcno:!needsSRC(f),
+           rri:f.rri, norri:!f.rri, qs:needQS(f), noqs:!needQS(f), hum:f.hum, ani:f.ani,
+           phba:(f.micro||f.tis), haz:f.haz, survey:f.survey, ai:f.ai, noai:!f.ai, paid:f.paid, nopaid:!f.paid};
+  return (c in m) ? !!m[c] : true;
+}
+function activeForms(){
+  var f = F(), out = [];
+  var order = ["bcsrc_cover","pjas_cover","pjas_reg","pjas_perm","pjas_med","form1","form1a","rplan","form1b","form2a","form3","form2b","form2c","form4","form5a","form5b","form6a","form6b","form7"];
+  for(var i=0;i<order.length;i++)
+    for(var j=0;j<FORMS.length;j++)
+      if(FORMS[j].id === order[i] && applies(FORMS[j],f)) out.push(FORMS[j]);
+  return out;
+}
+function fullTitle(fm){ return fm.title + (fm.sub ? " (" + fm.sub + ")" : ""); }
+
+/* =================== phase 1 =================== */
+function renderQ(){
+  var vs = visibleQs();
+  qi = Math.max(0, Math.min(qi, vs.length - 1));
+  var q = vs[qi];
+
+  var sh = "";
+  for(var i=0;i<vs.length;i++) sh += '<i class="'+(i<qi?"on":(i===qi?"now":""))+'"></i>';
+  var st = el("steps"); st.innerHTML = sh;
+  st.setAttribute("aria-valuenow", qi+1); st.setAttribute("aria-valuemax", vs.length);
+
+  el("qn").textContent = "Question " + (qi+1) + " of " + vs.length;
+  el("qt").textContent = q.q;
+  el("qh").innerHTML = q.help || "";
+  el("qex").innerHTML = q.ex ? '<div class="exbox"><b>'+q.ex[0]+'</b>'+q.ex[1]+'</div>' : "";
+  el("qu").textContent = q.unsure || "";
+  el("qu").hidden = !q.unsure;
+
+  var opts, cls;
+  if(q.type === "yn"){ opts = [{v:"yes",l:"Yes"},{v:"no",l:"No"}]; cls = "rad"; }
+  else if(q.type === "choice"){ opts = q.opts; cls = "rad"; }
+  else { opts = q.opts; cls = ""; }
+
+  var h = "";
+  for(var i=0;i<opts.length;i++){
+    var o = opts[i];
+    var on = (q.type === "multi") ? has(q.id,o.v) : (A[q.id] === o.v);
+    h += '<button type="button" class="ans '+cls+'" aria-pressed="'+(on?"true":"false")+'" data-q="'+q.id+'" data-v="'+o.v+'" data-t="'+q.type+'">'+
+         '<span class="mk" aria-hidden="true"></span><span class="lab"><b>'+o.l+'</b>'+(o.d?'<span>'+o.d+'</span>':'')+'</span></button>';
+  }
+  el("qa").innerHTML = h;
+
+  el("back").hidden = (qi === 0);
+  el("next").disabled = !answered(q);
+  el("next").textContent = (qi === vs.length-1) ? "See my forms →" : "Continue";
+  el("restart").hidden = true;
+}
+
+/* =================== phase 2 =================== */
+var NAMES = {bcsrc_cover:["cover","BCSRC Paperwork Checklist"],pjas_cover:["cover","PJAS Submission Checklist"],
+  pjas_reg:["PJAS","Registration Form"],pjas_perm:["PJAS","Presenter Permission Form"],pjas_med:["PJAS","Medical Form"],
+  form1:["1","Checklist for Adult Sponsor"],form1a:["1A","Student Checklist"],rplan:["RP","Research Plan"],
+  form1b:["1B","Approval Form"],form2a:["2A","Student Support Disclosure"],form3:["3","Risk Assessment"],
+  form2b:["2B","Qualified Scientist"],form2c:["2C","Regulated Research Institution"],form4:["4","Human Participants + Consent"],
+  form5a:["5A","Vertebrate Animal"],form5b:["5B","Vertebrate Animal (RRI)"],form6a:["6A","Hazardous Biological Agents"],
+  form6b:["6B","Tissue"],form7:["7","Continuation"]};
+var BORDER = ["bcsrc_cover","form1","form1a","rplan","form1b","form2a","form3","form2b","form4","form5a","form5b","form6a","form6b","form7","form2c"];
+var PORDER = ["pjas_cover","pjas_reg","pjas_perm","pjas_med","form1","form1a","rplan","form1b","form2a","form3","form2b","form4","form5a","form5b","form6a","form6b","form7","form2c"];
+
+function renderResults(){
+  var f = F(), list = activeForms(), extras = [], base = [];
+  for(var i=0;i<list.length;i++) (list[i].when === "always" ? base : extras).push(list[i]);
+
+  el("vbig").innerHTML = '<span>'+list.length+'</span> form'+(list.length===1?"":"s")+' to complete';
+  var fairs = [];
+  if(f.bcsrc) fairs.push("BCSRC"); if(f.pjas) fairs.push("PJAS Region 1C");
+  el("vsub").textContent = "For " + (fairs.join(" and ") || "no fair selected") + ". " +
+    (f.bcsrc && f.pjas ? "That is one complete, separately signed packet for each fair. " : "") +
+    (extras.length ? "Your answers added " + extras.length + " form" + (extras.length===1?"":"s") + " beyond the standard set." : "That is the standard set.");
+
+  var pre = [];
+  for(var i=0;i<list.length;i++) if(PREAPPROVAL[list[i].id]) pre.push(PREAPPROVAL[list[i].id]);
+  el("valert").innerHTML = (pre.length
+    ? '<div class="alert"><h3>Stop — these need approval before you experiment</h3>'+
+      '<p>Data you collect before approval cannot be used, and the project cannot be fixed afterwards. Email Mrs. Rhodes today.</p><ul><li>'+pre.join('</li><li>')+'</li></ul></div>' : '')
+    + '<div class="datecard"><span class="d">'+startDate(f)+'</span><div class="w"><h3>This is your experimentation start date</h3><p>'+
+      (needsSRC(f)
+        ? 'Your project needs prior approval from the SRC, an IRB, an IACUC, or an IBC, so you start on <b>12/23/2026</b>. The extra three weeks are the committee\'s review window — starting earlier means the data cannot be used.'
+        : 'Your project needs no prior committee approval, so you start on <b>12/01/2026</b>.')+
+      ' Write this date on Form 1A, and make sure every signature on Forms 1, 1B, and 3 is dated on or before it.</p></div></div>';
+
+  function build(ord){
+    var h = "";
+    for(var i=0;i<ord.length;i++)
+      for(var j=0;j<list.length;j++)
+        if(list[j].id === ord[i] && NAMES[ord[i]])
+          h += '<li><code>'+NAMES[ord[i]][0]+'</code> <span>'+NAMES[ord[i]][1]+(ord[i]==="form2c"?' <span class="late">— at check-in</span>':'')+'</span></li>';
+    return h;
+  }
+  var man = "";
+  if(f.bcsrc) man += '<div class="mf"><h3>BCSRC packet, in order</h3><ol>'+build(BORDER)+'</ol></div>';
+  if(f.pjas)  man += '<div class="mf"><h3>PJAS packet, in order</h3><ol>'+build(PORDER)+'</ol></div>';
+  el("vman").innerHTML = man;
+  var ds = document.getElementById("vddl");
+  if(ds) ds.innerHTML = '<div class="ddlstrip"><span class="dt">Due '+DEADLINE.short+'</span>'+
+    '<p>Every form below must be <b>complete, correct, signed, and handed to Mrs. Rhodes by '+DEADLINE.label+'</b>. '+
+    'Missing or incorrect paperwork after that date costs you your place in the club. No exceptions.</p>'+
+    '<span class="noex" style="font-family:var(--fm);font-size:13px;font-weight:600;letter-spacing:.14em;background:var(--stamp);color:#fff;border-radius:6px;padding:5px 11px">'+deadlineCountdown().toUpperCase()+'</span></div>';
+
+  var bt = [];
+  for(var i=0;i<base.length;i++){ var t = fullTitle(base[i]).replace(/\s*\(.*?\)\s*/g," ").trim(); if(bt.indexOf(t) === -1) bt.push(t); }
+  var wh = '<div class="wrow base"><code>'+base.length+'</code><div><b>Required of everyone</b><em>Every project entering your fair(s) submits these: '+bt.join("; ")+'.</em></div></div>';
+  for(var i=0;i<extras.length;i++)
+    wh += '<div class="wrow"><code>'+extras[i].num+'</code><div><b>'+fullTitle(extras[i])+'</b><em>'+extras[i].why+'</em></div></div>';
+  el("vwhy").innerHTML = wh;
+  el("restart").hidden = false;
+}
+
+/* =================== phase 3 =================== */
+function imgBlock(fm){
+  var im = fm.imgs || {}, parts = [];
+  var hasB = !!im.blank, hasF = !!im.filled;
+  if(hasB || hasF){
+    var mode = VIEW[fm.id] || (hasF ? "filled" : "blank");
+    if(mode === "filled" && !hasF) mode = "blank";
+    if(hasB && hasF){
+      parts.push('<div class="swap" role="group" aria-label="Choose blank or completed sample">'+
+        '<button type="button" data-swap="'+fm.id+'" data-mode="blank"  aria-pressed="'+(mode==="blank")+'">Blank form</button>'+
+        '<button type="button" data-swap="'+fm.id+'" data-mode="filled" aria-pressed="'+(mode==="filled")+'">Completed sample</button></div>');
+    }
+    var src = mode === "filled" ? im.filled : im.blank;
+    var cap = mode === "filled"
+      ? (fm.cap || "<b>Completed sample.</b>")
+      : "<b>The blank form.</b> This is the page exactly as you download it, before anything is written on it.";
+    parts.push('<figure><button class="shot" type="button" data-src="'+src+'" aria-label="Enlarge this page">'+
+      '<img src="'+src+'" alt="'+(mode==="filled"?"Completed sample of ":"Blank ")+fullTitle(fm)+'" loading="lazy"></button>'+
+      '<figcaption>'+cap+' <span class="zoomhint">Tap to enlarge.</span></figcaption></figure>');
+  }
+  if(fm.detail)  parts.push('<figure><button class="shot" type="button" data-src="'+fm.detail[0]+'" aria-label="Enlarge this detail"><img src="'+fm.detail[0]+'" alt="Close-up detail" loading="lazy"></button><figcaption>'+fm.detail[1]+'</figcaption></figure>');
+  if(fm.detail2) parts.push('<figure><button class="shot" type="button" data-src="'+fm.detail2[0]+'" aria-label="Enlarge this detail"><img src="'+fm.detail2[0]+'" alt="Close-up detail" loading="lazy"></button><figcaption>'+fm.detail2[1]+'</figcaption></figure>');
+  if(!parts.length)
+    parts.push('<div class="noshot">No image of this form yet. Download the current version from the <a href="'+FORMS_URL+'" target="_blank" rel="noopener">Society for Science forms page</a>, or ask Mrs. Rhodes for a copy.</div>');
+  return parts.join("");
+}
+
+function renderForm(fm,f){
+  var w = document.createElement("section");
+  w.className = "form"; w.id = "f_" + fm.id;
+  w.setAttribute("aria-labelledby","h_"+fm.id);
+  var tags = ""; for(var i=0;i<(fm.tags||[]).length;i++) tags += '<span class="tag '+fm.tags[i][0]+'">'+fm.tags[i][1]+'</span>';
+  var roles = ""; for(var i=0;i<(fm.roles||[]).length;i++) roles += '<div><dt>'+fm.roles[i][0]+'</dt><dd>'+fm.roles[i][1]+'</dd></div>';
+  var ch = "";
+  for(var i=0;i<fm.checks.length;i++){
+    var c = fm.checks[i]; if(!lineOn(c[1],f)) continue;
+    var cid = fm.id + "_" + i;
+    ch += '<label class="ck"><input type="checkbox" data-ck="'+cid+'"'+(DONE[cid]?" checked":"")+'><span class="mk" aria-hidden="true"></span><span class="tx">'+sub(c[0],f)+'</span></label>';
+  }
+  var notes = ""; for(var i=0;i<(fm.notes||[]).length;i++) notes += '<div class="note '+fm.notes[i][0]+'"><b>'+sub(fm.notes[i][1],f)+'</b>'+sub(fm.notes[i][2],f)+'</div>';
+
+  w.innerHTML =
+    '<header><span class="num" aria-hidden="true">'+fm.num+'</span><div class="t">'+
+      '<h3 id="h_'+fm.id+'">'+fullTitle(fm)+'</h3><div class="meta">'+tags+'</div></div></header>'+
+    '<div class="body"><div>'+
+      '<p class="lede">'+sub(fm.lede,f)+'</p>'+
+      (roles ? '<p class="sechead">Who fills it in</p><dl class="roles">'+roles+'</dl>' : '')+
+      '<p class="sechead">Step by step</p><div class="checks">'+ch+'</div>'+notes+
+    '</div><div class="shots">'+imgBlock(fm)+'</div></div>';
+  return w;
+}
+
+function pjasBrief(){
+  var d = document.createElement("section");
+  d.className = "brief"; d.id = "f_pjasinfo";
+  var cats = "";
+  for(var i=0;i<CATS.length;i++) cats += '<span class="cat"><b>'+CATS[i][0]+'</b> '+CATS[i][1]+'</span>';
+  d.innerHTML =
+    '<header><h3>PJAS Region 1C — what you need to know</h3>'+
+    '<p>Details that live on the PJAS forms themselves, collected in one place.</p></header>'+
+    '<div class="in">'+
+    '<dl class="facts">'+
+      '<div class="fact"><dt>Region</dt><dd>1C<small>Written on your registration form</small></dd></div>'+
+      '<div class="fact"><dt>Region directors</dt><dd>Dominic Fedele &amp; Kate Liese<small>Named on the medical form</small></dd></div>'+
+      '<div class="fact"><dt>Sponsor &amp; responsible adult at the meet</dt><dd>Michelle Rhodes<small>mrhodes@cbsd.org</small></dd></div>'+
+      '<div class="fact"><dt>School block, already filled in</dt><dd>Central Bucks High School South<small>1100 Folly Rd, Warrington, PA 18976 · 267-893-3000</small></dd></div>'+
+      '<div class="fact"><dt>Research title</dt><dd>60 characters maximum<small>Including spaces. Shorter than your ISEF title.</small></dd></div>'+
+      '<div class="fact"><dt>Advancing</dt><dd>First Award at Regionals → State<small>Signing the registration form commits you to attend</small></dd></div>'+
+    '</dl>'+
+    '<p class="sechead">The thirteen research categories — check exactly one</p>'+
+    '<div class="cats">'+cats+'</div>'+
+    '<div class="note warn"><b>Three things that disqualify a PJAS packet</b><ul>'+
+      '<li><b>A missing permission form.</b> The form states plainly that without it the student will not be allowed to compete.</li>'+
+      '<li><b>An altered permission form.</b> It may not be changed in any way — no retyping, no reformatting.</li>'+
+      '<li><b>A photocopied medical form.</b> Bring one original with original signatures to the meet.</li>'+
+    '</ul></div>'+
+    '<div class="note info"><b>Dates are not on this page on purpose</b>Registration deadlines, the regional meet date, and the state meet date change every year and come from Mrs. Rhodes. Do not take a date off an old form you find — the samples carry last year\'s pre-printed dates.</div>'+
+    '</div>';
+  return d;
+}
+
+function renderGuide(){
+  var f = F(), act = activeForms();
+  var host = el("forms"); host.innerHTML = "";
+  var th = "", seen = {};
+  function shortT(fm){ var t = fullTitle(fm).replace(/\s*\(.*?\)\s*/g," ").trim(); return t.length>28 ? t.slice(0,27).trim()+"…" : t; }
+
+  host.appendChild(renderForm(UNIVERSAL,f));
+  th += '<li><a href="#f_rules" data-tocid="rules"><span class="dot"></span><code>★</code> Ground rules</a></li>';
+
+  function emit(ord,label,sub){
+    var g = document.createElement("div"); g.className = "grp";
+    g.innerHTML = '<h2>'+label+'</h2><p>'+sub+'</p>';
+    host.appendChild(g);
+    th += '<li class="tg">'+label+'</li>';
+    for(var i=0;i<ord.length;i++){
+      for(var j=0;j<act.length;j++){
+        if(act[j].id !== ord[i]) continue;
+        var fm = act[j];
+        if(seen[fm.id]){
+          var cid = "dup_"+fm.id;
+          var d = document.createElement("div"); d.className = "dup";
+          d.innerHTML = '<div class="checks"><label class="ck"><input type="checkbox" data-ck="'+cid+'"'+(DONE[cid]?" checked":"")+
+            '><span class="mk" aria-hidden="true"></span><span class="tx"><b>'+fm.num+' · '+fullTitle(fm)+'</b> — second copy printed and signed for this packet. '+
+            '<a href="#f_'+fm.id+'">Full checklist above</a>.</span></label></div>';
+          host.appendChild(d);
+        } else {
+          seen[fm.id] = 1;
+          host.appendChild(renderForm(fm,f));
+          th += '<li><a href="#f_'+fm.id+'" data-tocid="'+fm.id+'"><span class="dot"></span><code>'+fm.num+'</code> '+shortT(fm)+'</a></li>';
+        }
+      }
+    }
+  }
+  if(f.bcsrc) emit(BORDER,"BCSRC packet","Every page in the Bucks County packet, in the order it is stapled.");
+  if(f.pjas){
+    emit(PORDER,"PJAS packet", f.bcsrc
+      ? "The PJAS packet repeats the ISEF forms above. You print and sign a second copy of each one — same content, fresh signatures."
+      : "Every page in the PJAS Region 1C packet, in the order it is stapled.");
+    host.appendChild(pjasBrief());
+    th += '<li><a href="#f_pjasinfo" data-tocid="pjasinfo"><span class="dot"></span><code>INFO</code> PJAS key facts</a></li>';
+  }
+
+  function build(ord){
+    var h = "";
+    for(var i=0;i<ord.length;i++)
+      for(var j=0;j<act.length;j++)
+        if(act[j].id === ord[i] && NAMES[ord[i]])
+          h += '<li><code>'+NAMES[ord[i]][0]+'</code> '+NAMES[ord[i]][1]+(ord[i]==="form2c"?' <span style="color:var(--amber)">— at check-in, after experimentation</span>':'')+'</li>';
+    return h;
+  }
+  var cols = "";
+  if(f.bcsrc) cols += '<div><h4 style="font-size:16px;margin-bottom:2px">BCSRC packet order</h4><ol class="order">'+build(BORDER)+'</ol></div>';
+  if(f.pjas)  cols += '<div><h4 style="font-size:16px;margin-bottom:2px">PJAS packet order</h4><ol class="order">'+build(PORDER)+'</ol></div>';
+
+  function ckRow(cid, text){
+    return '<label class="ck"><input type="checkbox" data-ck="'+cid+'"'+(DONE[cid]?" checked":"")+
+           '><span class="mk" aria-hidden="true"></span><span class="tx">'+text+'</span></label>';
+  }
+
+  var bundles = [];
+  if(f.bcsrc) bundles.push(["BCSRC","BCSRC Paperwork Checklist"]);
+  if(f.pjas)  bundles.push(["PJAS","PJAS Paperwork Submission Checklist"]);
+
+  var phys = "";
+  for(var i=0;i<bundles.length;i++){
+    phys += ckRow("phys_order_"+i, "My <b>"+bundles[i][0]+"</b> pages are stacked in the order above, with the <b>"+bundles[i][1]+"</b> on top as the first page.");
+    phys += ckRow("phys_clip_"+i,  "That <b>"+bundles[i][0]+"</b> stack is held together with a <s>paperclip</s> — not a staple, not a binder clip, not loose.");
+  }
+  phys += ckRow("phys_folder", bundles.length > 1
+    ? "Both paperclipped bundles are inside <s>one manila folder</s>, kept separate from each other."
+    : "The paperclipped bundle is inside a <s>manila folder</s>.");
+  phys += ckRow("phys_lip", "My <s>name is written on the top lip of the paperwork checklist</s>, so it can be read while the folder is closed.");
+  phys += ckRow("phys_single", "Everything is printed single-sided, and nothing is stapled.");
+
+  var signoff =
+    ckRow("sign_mentor", "My <b>mentor</b> has reviewed the whole folder, then <s>printed their name, signed, and dated</s> the top sheet.") +
+    ckRow("sign_peer",   "A <b>second club member</b> who is not my mentor has reviewed the whole folder, then <s>printed their name, signed, and dated</s> the top sheet.") +
+    ckRow("sign_both",   "Both sign-offs are on the <s>top sheet in the folder</s>, where they can be seen without opening anything.") +
+    ckRow("sign_real",   "Both people actually read my paperwork before signing. I did not sign either line myself.");
+
+  var finals = ["Every page is present and in the order above.",
+    "The project title reads identically on every page.",
+    "Every required signature is there, in ink, with a date.",
+    "No signature date falls after my experimentation start date of {START}.",
+    "Nothing that belongs to Mrs. Rhodes or the SRC has been filled in by me.",
+    "No field anywhere is blank — unused fields say N/A.",
+    "I have my own complete copy, scanned or photographed.",
+    "The folder is in Mrs. Rhodes's hands on or before " + DEADLINE.label + "."];
+  var fh = "";
+  for(var i=0;i<finals.length;i++) fh += ckRow("final_"+i, sub(finals[i], f));
+
+  var ddl = '<div class="ddl"><div class="top">'+
+    '<span class="dt">Deadline · '+DEADLINE.label+'</span>'+
+    '<span class="noex">NO EXCEPTIONS</span>'+
+    '<span class="cd">'+deadlineCountdown()+'</span></div>'+
+    '<ul>'+
+    '<li><span class="n">1</span><div><span class="h">Paperwork filled in incorrectly</span>Paperwork that is still filled in incorrectly after the '+DEADLINE.short+' deadline makes you <b>ineligible to compete within the club</b>.</div></li>'+
+    '<li><span class="n">2</span><div><span class="h">Paperwork not finished or not handed in</span>If your paperwork is not complete and submitted to Mrs. Rhodes by '+DEADLINE.short+', the result is <b>dismissal from the club</b>.</div></li>'+
+    '</ul></div>';
+
+  var asm = document.createElement("section");
+  asm.className = "form"; asm.id = "f_assembly";
+  asm.innerHTML = '<header><span class="num" aria-hidden="true">END</span><div class="t"><h3>Assemble, sign, and hand it in</h3>'+
+      '<div class="meta"><span class="tag req">Due '+DEADLINE.short+'</span><span class="tag cond">No exceptions</span></div></div></header>'+
+    '<div class="body" style="grid-template-columns:1fr"><div>'+
+      ddl+
+      '<p class="lede">The folder gets checked as an object, not just as a stack of forms. Build it exactly like this.</p>'+
+      '<p class="sechead">Step 1 · The page order inside each packet</p>'+
+      '<div class="two">'+cols+'</div>'+
+      '<p class="sechead">Step 2 · Putting the folder together</p>'+
+      '<div class="checks">'+phys+'</div>'+
+      '<p class="sechead">Step 3 · The two sign-offs on top</p>'+
+      '<dl class="roles">'+
+        '<div><dt>Signature 1</dt><dd>Your <b>mentor</b> — prints their name, signs, and dates it</dd></div>'+
+        '<div><dt>Signature 2</dt><dd>Another <b>club member</b> who read your paperwork — prints their name, signs, and dates it</dd></div>'+
+        '<div><dt>Where</dt><dd>On the top sheet in the folder, visible without opening anything</dd></div>'+
+      '</dl>'+
+      '<div class="checks" style="margin-top:10px">'+signoff+'</div>'+
+      '<p class="sechead">Step 4 · Final pass before you hand it over</p>'+
+      '<div class="checks">'+fh+'</div>'+
+      (bundles.length > 1 ? '<div class="note warn"><b>One packet per fair</b>Entering both fairs means printing and signing two complete packets, each with its own checklist on top and its own paperclip. You cannot submit one packet to one fair and retrieve it for the other.</div>' : '')+
+    '</div></div>';
+  host.appendChild(asm);
+  th += '<li class="tg">Finish</li>';
+  th += '<li><a href="#f_assembly" data-tocid="assembly"><span class="dot"></span><code>END</code> Assemble</a></li>';
+  el("toc").innerHTML = th;
+  updateProgress();
+  el("restart").hidden = false;
+}
+
+function updateProgress(){
+  var boxes = document.querySelectorAll('#p3 .checks input[type="checkbox"]');
+  var total = boxes.length, done = 0;
+  for(var i=0;i<boxes.length;i++) if(boxes[i].checked) done++;
+  var p = total ? Math.round(done/total*100) : 0;
+  el("barfill").style.width = p+"%";
+  el("pct").textContent = p+"%";
+  el("cnt").textContent = done+" of "+total+" steps";
+  var bar = document.querySelector(".bar"); if(bar) bar.setAttribute("aria-valuenow", p);
+  var cards = document.querySelectorAll("#p3 .form");
+  for(var i=0;i<cards.length;i++){
+    var c = cards[i], bs = c.querySelectorAll('.checks input[type="checkbox"]'), d = 0;
+    for(var j=0;j<bs.length;j++) if(bs[j].checked) d++;
+    var link = document.querySelector('[data-tocid="'+c.id.replace("f_","")+'"]');
+    c.classList.toggle("isdone", bs.length>0 && d===bs.length);
+    if(link){ link.classList.toggle("done", bs.length>0 && d===bs.length); link.classList.toggle("part", d>0 && d<bs.length); }
+  }
+}
+
+function show(n){
+  PHASE = n; save();
+  el("p1").hidden = n!==1; el("p2").hidden = n!==2; el("p3").hidden = n!==3;
+  if(n===1) renderQ();
+  if(n===2) renderResults();
+  if(n===3) renderGuide();
+  window.scrollTo(0,0);
+}
+
+/* =================== events =================== */
+el("qa").addEventListener("click", function(e){
+  var b = e.target.closest(".ans"); if(!b) return;
+  var id = b.getAttribute("data-q"), v = b.getAttribute("data-v"), t = b.getAttribute("data-t");
+  if(t === "multi"){
+    var cur = A[id] ? A[id].slice() : [];
+    var k = cur.indexOf(v);
+    if(k === -1) cur.push(v); else cur.splice(k,1);
+    A[id] = cur; save(); renderQ();
+  } else {
+    A[id] = v; save();
+    var vs = visibleQs();
+    if(qi < vs.length-1){ qi++; renderQ(); }
+    else { renderQ(); if(complete()) show(2); }
+  }
+});
+el("next").addEventListener("click", function(){
+  var vs = visibleQs();
+  if(qi < vs.length-1){ qi++; renderQ(); }
+  else if(complete()) show(2);
+});
+el("back").addEventListener("click", function(){ if(qi>0){ qi--; renderQ(); } });
+el("toGuide").addEventListener("click", function(){ show(3); });
+el("redo").addEventListener("click", function(){ qi = 0; show(1); });
+el("restart").addEventListener("click", function(){ qi = 0; show(1); });
+el("backRes").addEventListener("click", function(){ show(2); });
+el("reset").addEventListener("click", function(){
+  DONE = {}; save();
+  var b = document.querySelectorAll('#p3 .checks input[type="checkbox"]');
+  for(var i=0;i<b.length;i++) b[i].checked = false;
+  updateProgress();
+});
+document.addEventListener("change", function(e){
+  var t = e.target;
+  if(t && t.getAttribute && t.getAttribute("data-ck")){
+    var k = t.getAttribute("data-ck");
+    if(t.checked) DONE[k] = 1; else delete DONE[k];
+    save(); updateProgress();
+  }
+});
+document.addEventListener("click", function(e){
+  var sw = e.target.closest ? e.target.closest("[data-swap]") : null;
+  if(sw){
+    var fid = sw.getAttribute("data-swap");
+    VIEW[fid] = sw.getAttribute("data-mode"); save();
+    var card = el("f_"+fid);
+    var all = [UNIVERSAL].concat(FORMS), fm = null;
+    for(var i=0;i<all.length;i++) if(all[i].id === fid) fm = all[i];
+    if(card && fm){ card.querySelector(".shots").innerHTML = imgBlock(fm); }
+    return;
+  }
+  var b = e.target.closest ? e.target.closest(".shot") : null;
+  if(b){
+    var lb = document.createElement("div");
+    lb.className = "lb";
+    lb.innerHTML = '<button class="x" type="button" aria-label="Close enlarged view">×</button><img src="'+b.getAttribute("data-src")+'" alt="Enlarged form page">';
+    lb.addEventListener("click", function(){ lb.remove(); b.focus(); });
+    document.body.appendChild(lb);
+    lb.querySelector(".x").focus();
+  }
+});
+document.addEventListener("keydown", function(e){
+  if(e.key === "Escape"){ var lb = document.querySelector(".lb"); if(lb) lb.remove(); }
+});
+
+load();
+if(!complete()) PHASE = 1;
+show(PHASE);
+</script>
+
+</body>
+</html>
